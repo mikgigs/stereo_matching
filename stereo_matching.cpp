@@ -71,12 +71,12 @@ Mat Stereo::census_transform(Mat image, int windowsize) {
 	}
 	return imgDisparity8U;
 }
-Mat Stereo::stereo_match(Mat left, Mat right) {
-	int h = left.rows;
-	int w = left.cols;
+Mat Stereo::stereo_match(const Mat left, const Mat right) {
+	const int h = left.rows;
+	const int w = left.cols;
 	Mat imgDisparity8U = Mat(left.rows, left.cols, CV_8U);
-	int window_half = win_size_ / 2;
-	int adjust = 255 / max_disparity_;
+	const int window_half = win_size_ / 2;
+	const int adjust = 255 / max_disparity_;
 	//decide which matching cost function to use 
 	if (cost_ == "rank") {
 		left = Stereo::rank_transform(left, tran_win_size_);
@@ -90,7 +90,7 @@ Mat Stereo::stereo_match(Mat left, Mat right) {
 #pragma omp parallel for 
 		for (int y = window_half; y < h - window_half; ++y) {
 			uchar *imgDisparity_y = imgDisparity8U.ptr(y);
-			for (int x = window_half; x < w - window_half; ++x) {
+			for (int x = (window_half+max_disparity_); x < w - window_half; ++x) {
 				int prev_ssd = INT_MAX;
 				int best_dis = 0;
 				for (int off = 0; off < max_disparity_; ++off) {
